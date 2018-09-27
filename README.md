@@ -1,9 +1,14 @@
 ## validatingCSV: A Declarative, Validating CSV Reader Library For Python 3
- 
+
+### Overview
+
+validatingCSV is a Python package for inputting and converting data from CSV iterables.
+Use validatingCSV when your CSV data absolutely, positively has to be valid.
+Which is pretty much always.
+
 ### Design Goals
 
-validatingCsv is a Python package for inputting and converting data from CSV iterables.
-It has the following design goals:
+validatingCSV has the following design goals:
 
 * Maximum input validation. This is based on the developers long experience that
 that bad input data is far more common that is usually supposed. We want to check the
@@ -28,21 +33,23 @@ for an error file is specified. It should also be easy to additionally write the
 * It should be possible to generate named tuples easily with the names supplied by
 the user in the input specification.
 
-### Tradeoffs
+### Trade-offs
 
 Since validatingCSV does everything the built-in csv module does and a lot more, it is naturally
-going to be slower. This is a more than acceptable tradeoff in most contexts, since getting
+going to be slower. This is a more than acceptable trade-off in most contexts, since getting
 the wrong answer quickly isn't very useful. Programming is ultimately about data, and bad
-data is worse than no data, especially when we don't know it's bad.
+data is worse than no data, especially when you don't know it's bad.
 
 ### How It Works
 
-* Import the validatingCSV module.
-
-* Create a validatingCSV reader object.
-
 ```python
-csv_reader = CSV_ValidatingReader(csv_file_path, csv_validation_spec)
+import validatingCSV as vcsv
+
+validationParams = {...}
+with open('spam.csv', newline='') as csvfile:
+    spamreader = vcsv.reader(csvfile, validationParams)
+    for row in spamreader:
+        print()
 ```
 
 ### CSV Iterable API
@@ -60,7 +67,7 @@ csv reader.
 
 To specify parameters for the CSV iterable, define a dict that contains entries for
 any of the parameters that need to be supplied to the csv reader, as defined in
-[the documentation for the Dialect class](https://docs.python.org/3/library/csv.html#csv-fmt-params).
+the [documentation for the Dialect class](https://docs.python.org/3/library/csv.html#csv-fmt-params).
 What follows is a repetition of the information found there, put here for convenience.
 
 * 'fields' : Required. A sequence of field definitions (see Field Specification API below).
@@ -71,7 +78,7 @@ are to be validated and/or converted.
 
 * 'doublequote' : Controls how instances of quotechar appearing inside a field should themselves be quoted. When True, the character is doubled. When False, the escapechar is used as a prefix to the quotechar. It defaults to True.
 
-On output, if doublequote is False and no escapechar is set, Error is raised if a quotechar is found in a field.
+  * On output, if doublequote is False and no escapechar is set, Error is raised if a quotechar is found in a field.
 
 * 'escapechar' : A one-character string used by the writer to escape the delimiter if quoting is set to QUOTE_NONE and the quotechar if doublequote is False. On reading, the escapechar removes any special meaning from the following character. It defaults to None, which disables escaping.
 
@@ -85,10 +92,11 @@ On output, if doublequote is False and no escapechar is set, Error is raised if 
 
 * 'strict' : When True, raise exception Error on bad CSV input. The default is False.
 
+
 #### Field Specification API
 
 Every row in a CSV iterable (except possibly the headers) has (or should have) the same number of fields. While the CSV Iterable API defines the parameters for the file or stream as a whole,
-the row API allows you to define a name, validators, and data convertors for each field.
+the row API allows you to define a name, validators, and data converters for each field.
 
 A row specification consists of a sequence of field specifications, with exactly one specification for each field in the row.
 
@@ -118,7 +126,8 @@ empty string if missing or the value is falsy.
 will be typed as a string, or one of str, int, float, complex, or ord
 (without enclosing in quotes).
 If not present or falsy, this defaults to str and no check is done on the type of the field's
-contents, since all fields are read in as strings. This is also true if you specify 'type': str. Forgoing a type check saves time.
+contents, since all fields are read in as strings. This is also true if you specify 'type': str.
+Forgoing a type check saves time.
 If the type is ord, the Unicode integer code point of the character is returned.
 
 * 'default' : The default value to return if the field is empty. This default will be checked
@@ -154,7 +163,8 @@ twice in some cases, saving time.
 Note that, if present, 'min', 'max', and/or 'valid_values' checks will be done before
 this is called.
 If no conversion has been done, then the second parameter will be None.
+Return the error message as a string if there is an error, else return a falsy value.
 
-* 'convertor' : A user-defined function that is called with a single parameter: 
+* 'converter' : A user-defined function that is called with a single parameter:
 the original (string) value of the field. It returns the converted value of the field,
 which is then passed to the caller as the field's value.
