@@ -10,7 +10,8 @@ Which is pretty much always.
 
 validatingCSV has the following design goals:
 
-* Maximum input validation. This is based on the developers long experience that
+* Maximum input validation. This is based on this developer's long experience with
+data conversion, where the main lesson has been that
 that bad input data is far more common that is usually supposed. We want to check the
 input data in every way possible.
 
@@ -95,7 +96,8 @@ are to be validated and/or converted.
 
 #### Field Specification API
 
-Every row in a CSV iterable (except possibly the headers) has (or should have) the same number of fields. While the CSV Iterable API defines the parameters for the file or stream as a whole,
+Every row in a CSV iterable (except possibly the headers) has (or should have) the same number of fields.
+While the CSV Iterable API defines the parameters for the file or stream as a whole,
 the row API allows you to define a name, validators, and data converters for each field.
 
 A row specification consists of a sequence of field specifications, with exactly one specification for each field in the row.
@@ -135,7 +137,7 @@ against the type and an exception will be raised if they are not consistent.
 
 * 'base' : The base (radix) to by the int(num, base) function for integer conversions.
 This must be either missing, falsy, or one of the legal values for the base parameter.
-These are 0 or 2 - 36. The value 0 is treated as base 10.
+These are 2 - 36.
 If this is present when the 'type' entry is missing, falsy or not int,
 an exception will be thrown. If the base is not a valid value, an exception is thrown.
 If present when 'type' == int and the base is valid, the field is converted to an

@@ -9,12 +9,12 @@ class ValidatingCSVReader:
     Rows with bad data are written to an error file.
     """
 
-    def __init__(self, csvfile, reader_params, row_validation_params):
-        self.csvfile    = csvfile
-        self.csv_reader = csv.reader(csvfile, **reader_params)
+    def __init__(self, csvfilepath, reader_params, row_validation_params):
+        self.csvfile = open(csvfilepath)
+        self.csv_reader = csv.reader(self.csvfile, **reader_params)
+        self.error_file = open(csvfilepath + '.errors', 'w')
         self.row_validation_params = row_validation_params
-        self.row_tuple_type = self.make_row_tuple_type()
-        #self.err_file_path  = err_file_path
+        self.Row_tuple_type = self.make_row_tuple_type()
 
     def make_row_tuple_type(self):
         fieldnames = [d['name'] for d in self.row_validation_params]
@@ -22,18 +22,23 @@ class ValidatingCSVReader:
 
     def write_errors(self, errors):
         for err in errors:
-
-            #sys.stderr.write(str(err) + '\n')
+            self.error_file.write(str(err))
         return
 
     def __next__(self):
-        row = next(self.csv_reader)    # returns a list of strings
+        try:
+            row = next(self.csv_reader)    # returns a list of strings
+        except:
+            # This is the place to close the files when we run out of records
+            self.csvfile.close()
+            self.error_file.close()
+            raise StopIteration
         err_list, new_row = self.row_validator(row)
         if err_list:
             self.write_errors(err_list)
             return
         else:
-            return self.row_tuple_type(*new_row)
+            return self.Row_tuple_type(*new_row)
 
     def __iter__(self):
         return self
@@ -61,13 +66,17 @@ class ValidatingCSVReader:
             if valid_values_error:
                 err_list.append(valid_values_error)
 
+            range_error = self.range_error(field, field_validation_params)
+            if range_error:
+                err_list.append(range_error)
+
             error_checker_error = self.error_checker_error(field, field_validation_params)
             if error_checker_error:
                 err_list.append(error_checker_error)
 
             # If an error has not yet occurred, include the row at the start of the error output.
-            if err_list:
-                err_list.insert(0, '------\n' + str(row))
+            if type_error or valid_values_error or error_checker_error or range_error:
+                err_list.insert(0, '\n\n------\n' + str(row) + '\n')
 
             new_row[i] = self.convert_value(field, field_validation_params)
         return err_list, new_row
@@ -75,17 +84,42 @@ class ValidatingCSVReader:
     def field_type_error(self, field, field_validation_params):
         if 'type' in field_validation_params:
             field_type = field_validation_params['type']
-            try:
-                value = field_type(field)
-            except ValueError:
-                return field + ' is not a valid instance of ' + field_type.__name__
+            # Check integer types
+            if field_type == 'integer':
+                try:
+                    value = int(field)
+                except ValueError:
+                    return 'Value "' + field + '" is not an integer\n'
+            # Check float types
+            if field_type == 'float':
+                try:
+                    value = float(field)
+                except ValueError:
+                    return 'Value "' + field + '" is not an float\n'
+            # Check complex types
+            if field_type == 'complex':
+                try:
+                    value = complex(field)
+                except ValueError:
+                    return 'Value "' + field + '" is not an complex number\n'
         return
 
     def valid_values_error(self, field, field_validation_params):
         if 'valid_values' in field_validation_params:
             if field not in field_validation_params['valid_values']:
-                return field + ' is not a valid value of the ' + field_validation_params['name'] + ' field'
+                return field + ' is not a valid value of the ' + field_validation_params['name'] + ' field\n'
         return
+
+    def range_error(self, field, field_validation_params):
+        converted_value = self.convert_value(field, field_validation_params)
+        if 'min' in field_validation_params:
+            min_value = field_validation_params['min']
+            if converted_value < min_value:
+                return 'Value "' + field + '" is less than the specified min value\n'
+        if 'max' in field_validation_params:
+            max_value = field_validation_params['max']
+            if converted_value > max_value:
+                return 'Value "' + field + '" is greater than the specified max value\n'
 
     def error_checker_error(self, field, field_validation_params):
         if 'error_checker' in field_validation_params:
@@ -95,9 +129,16 @@ class ValidatingCSVReader:
                 return error_str
         return
 
+    def type_based_conversion(self, field, field_validation_params):
+        type_converter = field_validation_params.get('converter', None)
+        return type_converter(field) if type_converter else field
+
     def convert_value(self, field, field_validation_params):
+        # Return default value for the field if it's an empty string
+        if field == '':
+            return field_validation_params.get('default', '')
         converter = field_validation_params.get('converter', None)
-        if converter:
-            return converter(field)
-        else:
-            return field
+        # Including the field_validation_params in this call allows the converter
+        # to use the base parameter for integer conversions plus any future parameters.
+        base  = field_validation_params.get('base', 10)
+        return converter(field, base) if converter else field
