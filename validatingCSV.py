@@ -106,7 +106,8 @@ class ValidatingCSVReader:
 
     def valid_values_error(self, field, field_validation_params):
         if 'valid_values' in field_validation_params:
-            if field not in field_validation_params['valid_values']:
+            converted_value = self.convert_value(field, field_validation_params)
+            if converted_value not in field_validation_params['valid_values']:
                 return field + ' is not a valid value of the ' + field_validation_params['name'] + ' field\n'
         return
 
@@ -124,7 +125,7 @@ class ValidatingCSVReader:
     def error_checker_error(self, field, field_validation_params):
         if 'error_checker' in field_validation_params:
             checker = field_validation_params['error_checker']
-            error_str = checker(field)
+            error_str = checker(field, field_validation_params)
             if error_str:
                 return error_str
         return
@@ -140,5 +141,5 @@ class ValidatingCSVReader:
         converter = field_validation_params.get('converter', None)
         # Including the field_validation_params in this call allows the converter
         # to use the base parameter for integer conversions plus any future parameters.
-        base  = field_validation_params.get('base', 10)
+        base = field_validation_params.get('base', 10)
         return converter(field, base) if converter else field
