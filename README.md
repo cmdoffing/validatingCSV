@@ -10,8 +10,7 @@ Which is pretty much always.
 
 validatingCSV has the following design goals:
 
-* Maximum input validation. This is based on this developer's long experience with
-data conversion, where the main lesson has been that
+* Maximum input validation. This is based on the developers long experience that
 that bad input data is far more common that is usually supposed. We want to check the
 input data in every way possible.
 
@@ -23,13 +22,15 @@ sometimes requires functional code. No OOP or imperative code should ever be nec
 
 * It must be possible to specify more than one validator for each field.
 This makes it easier to clarify intent, since each validator is doing exactly one (small) thing.
-Validation for a field, but not a row, should
-stop immediately after the first validation failure, since spurious and confusing error
-messages may be generated due to the preconditions of later validators not holding.
 
 * Validation error messages should include the erroneous CSV row as well as all error
 messages from all validators. These should be written to a text (utf-8) file if a path
 for an error file is specified. It should also be easy to additionally write them to stderr.
+
+* For elegance and efficiency, rows are returned as named tuples. These are the most natural
+fit for CSV row output.
+
+* Rows with invalid values should appear only in the error file, not in the output.
 
 * It should be possible to generate named tuples easily with the names supplied by
 the user in the input specification.
@@ -41,16 +42,42 @@ going to be slower. This is a more than acceptable trade-off in most contexts, s
 the wrong answer quickly isn't very useful. Programming is ultimately about data, and bad
 data is worse than no data, especially when you don't know it's bad.
 
-### How It Works
+### Example Usage
 
 ```python
+import sys
 import validatingCSV as vcsv
 
-validationParams = {...}
-with open('spam.csv', newline='') as csvfile:
-    spamreader = vcsv.reader(csvfile, validationParams)
-    for row in spamreader:
-        print()
+
+readerParams = {'delimiter': '|'}
+
+
+def description_is_invalid(field, field_validation_params):
+    return 'Description is too long\n' if len(field) > 15 else None
+
+def price_converter(field, base):
+    return round(float(field))
+
+def year_converter(field, base):
+    return int(field, base)
+
+
+year_validation   = {'name': 'year', 'desc': 'The year the car was made.',
+                     'type': int, 'valid_values': [1996, 1997, 1998, 1999], 'converter': year_converter}
+make_validation   = {'name': 'make', 'valid_values': set(['Ford', 'Chevy', 'Jeep'])}
+model_validation  = {'name': 'model', 'min': 'AAA', 'max': 'zzz'}
+desc_validation   = {'name': 'description', 'error_checker': description_is_invalid}
+price_validation  = {'name': 'price', 'type': float, 'converter': price_converter}
+validation_params = (year_validation, make_validation, model_validation, desc_validation, price_validation)
+
+
+if __name__ == '__main__':
+    filepath = sys.argv[1]
+    rdr = vcsv.ValidatingCSVReader(filepath, readerParams, validation_params)
+    for row in rdr:
+        if row:
+            print(row)
+
 ```
 
 ### CSV Iterable API
@@ -72,8 +99,7 @@ the [documentation for the Dialect class](https://docs.python.org/3/library/csv.
 What follows is a repetition of the information found there, put here for convenience.
 
 * 'fields' : Required. A sequence of field definitions (see Field Specification API below).
-These tell the validatingCSV reader which fields in a row are to be processed and how they
-are to be validated and/or converted.
+These tell the validatingCSV reader how fields in a row are to be validated and/or converted.
 
 * 'delimiter' : A one-character string used to separate fields. It defaults to ','.
 
@@ -100,14 +126,14 @@ Every row in a CSV iterable (except possibly the headers) has (or should have) t
 While the CSV Iterable API defines the parameters for the file or stream as a whole,
 the row API allows you to define a name, validators, and data converters for each field.
 
-A row specification consists of a sequence of field specifications, with exactly one specification for each field in the row.
+A row specification consists of a sequence of field specifications,
+with exactly one specification for each field in the row.
 
 If the rows have fields at the end that you want to ignore, you can forgo specifying
 field validations for these. They will be ignored.
 
-Since the API uses dictionaries to specify the fields, it is useful to check to make sure the 
-keys and their values are all accurate. All of the following attributes are optional
-except for 'name.'
+Since the API uses dictionaries to specify the fields.
+All of the following attributes are optional except for 'name.'
 
 Frequently, you will want to ignore the values from a given field.
 To handle this case, place a falsy value (None is recommended) in the field specification.
@@ -121,52 +147,38 @@ in the current row.
 This will be used to create the field's name in the named tuple representing the row.
 The name must be a valid Python identifier.
 
-* 'desc' : A string describing the field. Useful for program documentation. Defaults to
-empty string if missing or the value is falsy.
+* 'desc' : A string describing the field. Useful for program documentation.
 
-* 'type' : If present, this must be either a falsy value, in which case the field
-will be typed as a string, or one of str, int, float, complex, or ord
-(without enclosing in quotes).
-If not present or falsy, this defaults to str and no check is done on the type of the field's
-contents, since all fields are read in as strings. This is also true if you specify 'type': str.
-Forgoing a type check saves time.
-If the type is ord, the Unicode integer code point of the character is returned.
+* 'type' : If present, this must be either 'integer', 'float', or 'complex'.
+If not present, no check is done on the type of the field's
+contents, since all fields are read in as strings. Forgoing a type check saves time.
 
-* 'default' : The default value to return if the field is empty. This default will be checked
-against the type and an exception will be raised if they are not consistent.
+* 'default' : The default value to return if the field is empty.
 
 * 'base' : The base (radix) to by the int(num, base) function for integer conversions.
-This must be either missing, falsy, or one of the legal values for the base parameter.
-These are 2 - 36.
-If this is present when the 'type' entry is missing, falsy or not int,
-an exception will be thrown. If the base is not a valid value, an exception is thrown.
-If present when 'type' == int and the base is valid, the field is converted to an
-integer using this base.
+This must be either missing or one of the legal values for the base parameter, which
+are 2 - 36.
 
 * 'min' : The minimum value of the field. This can be an integer, a float, a complex number,
 or a string. The standard Python comparison operator is used.
+If the 'converter' parameter is present, the converter is called and its result value
+is compared to the 'min' value.
 
-* 'max' : The maximum value of a field. Similar considerations as for 'min'.
+* 'max' : The maximum value of a field. Similar considerations apply as for 'min'.
 
 * 'valid_values' : An iterable containing only those values that are valid for this field.
-If this is present and either 'min' or 'max' is present and truthy, an exception is thrown.
 If a non-string type is used, the field will first be converted to a value of that type
 before this check is made.
-Strings types are checked directly against the values here.
-All values in this field will be checked against the 'type' entry and an exception
-will be thrown if there is a mismatch.
-When enumerating valid values, a frozenset is recommended.
+Strings are checked directly against the values here.
 
 * 'error_checker' : A user-defined function that is called with two parameters:
 the original (string)
-value of the field as the first parameter and the converted value (if a non-string
-'type' entry is present) is the second. This is to avoid doing the conversion
-twice in some cases, saving time.
-Note that, if present, 'min', 'max', and/or 'valid_values' checks will be done before
-this is called.
-If no conversion has been done, then the second parameter will be None.
+value of the field as the first parameter and the field_validation_params
+ is the second.
+Note that, if present, 'min', 'max', and/or 'valid_values' checks will still be done.
 Return the error message as a string if there is an error, else return a falsy value.
 
-* 'converter' : A user-defined function that is called with a single parameter:
-the original (string) value of the field. It returns the converted value of the field,
+* 'converter' : A user-defined function that is called with a two parameters:
+the original (string) value of the field and a base value, to be used in case an
+integer conversion is being done. It returns the converted value of the field,
 which is then passed to the caller as the field's value.
