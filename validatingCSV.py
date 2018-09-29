@@ -12,7 +12,7 @@ class ValidatingCSVReader:
     def __init__(self, csvfilepath, reader_params, row_validation_params):
         self.csvfile = open(csvfilepath)
         self.csv_reader = csv.reader(self.csvfile, **reader_params)
-        self.error_file = open(csvfilepath + '.errors', 'w')
+        self.errors = []
         self.row_validation_params = row_validation_params
         self.Row_tuple_type = self.make_row_tuple_type()
 
@@ -20,22 +20,16 @@ class ValidatingCSVReader:
         fieldnames = [d['name'] for d in self.row_validation_params]
         return namedtuple('RowTuple', fieldnames)
 
-    def write_errors(self, errors):
-        for err in errors:
-            self.error_file.write(str(err))
-        return
-
     def __next__(self):
         try:
             row = next(self.csv_reader)    # returns a list of strings
         except:
-            # This is the place to close the files when we run out of records
+            # This is the place to close the input file when we run out of records
             self.csvfile.close()
-            self.error_file.close()
             raise StopIteration
         err_list, new_row = self.row_validator(row)
         if err_list:
-            self.write_errors(err_list)
+            self.errors.extend(err_list)
             return
         else:
             return self.Row_tuple_type(*new_row)
