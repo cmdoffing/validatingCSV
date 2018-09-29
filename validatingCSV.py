@@ -76,7 +76,7 @@ class ValidatingCSVReader:
 
             # If an error has not yet occurred, include the row at the start of the error output.
             if type_error or valid_values_error or error_checker_error or range_error:
-                err_list.insert(0, '\n\n------\n' + str(row) + '\n')
+                err_list.insert(0, '\n\n' + str(row) + '\n')
 
             new_row[i] = self.convert_value(field, field_validation_params)
         return err_list, new_row
