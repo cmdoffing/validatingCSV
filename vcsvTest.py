@@ -1,11 +1,12 @@
 import sys
-import validatingCSV as vcsv
+import validatingCSV
 import params
 
 
 if __name__ == '__main__':
     filepath = sys.argv[1]
-    rdr = vcsv.ValidatingCSVReader(filepath, params.readerParams, params.validation_params)
+    rdr = validatingCSV.ValidatingCSVReader(filepath,
+                        params.readerParams, params.validation_params)
     for row in rdr:
         if row:
             print(row)

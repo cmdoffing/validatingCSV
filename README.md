@@ -49,7 +49,7 @@ import sys
 import validatingCSV as vcsv
 
 
-readerParams = {'delimiter': '|'}
+readerParams = {'delimiter': '|', 'max_bad_rows': 100}
 
 
 def description_is_invalid(field, field_validation_params):
@@ -96,10 +96,8 @@ csv reader.
 To specify parameters for the CSV iterable, define a dict that contains entries for
 any of the parameters that need to be supplied to the csv reader, as defined in
 the [documentation for the Dialect class](https://docs.python.org/3/library/csv.html#csv-fmt-params).
-What follows is a repetition of the information found there, put here for convenience.
-
-* 'fields' : Required. A sequence of field definitions (see Field Specification API below).
-These tell the validatingCSV reader how fields in a row are to be validated and/or converted.
+Most of what follows is a repetition of the information found there, except as marked below,
+put here for convenience.
 
 * 'delimiter' : A one-character string used to separate fields. It defaults to ','.
 
@@ -118,6 +116,13 @@ These tell the validatingCSV reader how fields in a row are to be validated and/
 * 'skipinitialspace' : When True, whitespace immediately following the delimiter is ignored. The default is False.
 
 * 'strict' : When True, raise exception Error on bad CSV input. The default is False.
+
+The following parameters are new to validatingCSV:
+
+* 'max_bad_rows': The maximum number of rows with errors that can occur before the iterator terminates.
+  If this limit is exceeded a message similar to "101 bad CSV rows. max_bad_rows limit exceeded." is sent
+  to stderr. Further processing is then terminated. This parameter is useful with large CSV files or for
+  testing out validation parameters, where a mistake may cause every row to be marked as bad.
 
 
 #### Field Specification API

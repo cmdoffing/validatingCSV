@@ -10,9 +10,14 @@ class ValidatingCSVReader:
     """
 
     def __init__(self, csvfilepath, reader_params, row_validation_params):
+        self.errors = []
+        self.num_bad_rows = 0
+        self.max_bad_rows = reader_params.get('max_bad_rows', 1000)
+        if 'max_bad_rows' in reader_params:
+            del reader_params['max_bad_rows']
+
         self.csvfile = open(csvfilepath)
         self.csv_reader = csv.reader(self.csvfile, **reader_params)
-        self.errors = []
         self.row_validation_params = row_validation_params
         self.Row_tuple_type = self.make_row_tuple_type()
 
@@ -30,6 +35,10 @@ class ValidatingCSVReader:
         err_list, new_row = self.row_validator(row)
         if err_list:
             self.errors.extend(err_list)
+            self.num_bad_rows += 1
+            if self.num_bad_rows > self.max_bad_rows:
+                sys.stderr.write(str(self.num_bad_rows) + " bad CSV rows. max_bad_rows limit exceeded.\n")
+                raise StopIteration
             return
         else:
             return self.Row_tuple_type(*new_row)
