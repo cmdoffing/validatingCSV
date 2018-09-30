@@ -18,7 +18,7 @@ model_validation  = {'name': 'model', 'min': 'AAA', 'max': 'zzz'}
 desc_validation   = {'name': 'description', 'error_checker': description_is_invalid}
 price_validation  = {'name': 'price', 'type': float, 'converter': price_converter}
 
-validation_params = (year_validation, make_validation, model_validation, desc_validation, price_validation)
+validation_params = (year_validation, None, None, desc_validation, price_validation)
 
 readerParams = {
                 'delimiter': '|',

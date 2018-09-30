@@ -31,8 +31,9 @@ class ValidatingCSVReader:
         self.Row_tuple_type = self.make_row_tuple_type()
 
     def make_row_tuple_type(self):
-        fieldnames = [d['name'] for d in self.row_validation_params]
-        return namedtuple('RowTuple', fieldnames)
+        fieldnames = [d['name'] for d in self.row_validation_params if d]
+        nmdtuple = namedtuple('RowTuple', fieldnames)
+        return nmdtuple
 
     def __next__(self):
         try:
@@ -55,20 +56,27 @@ class ValidatingCSVReader:
     def __iter__(self):
         return self
 
+    def validated_field(self, index):
+        return self.row_validation_params[index]
+
     def row_validator(self, row):
         """
-        Checks each row (which is a list of strings) against self.params for errors.
+        Checks each row (which is a list of strings) against self.row_validation_params for errors.
         Returns an empty list if the row is valid, error info otherwise.
         If an error is found, add the row to the front of the list followed by all of the
         error messages from the row.
         The row param is checked against self.row_validation_params, which is a list of dicts
         of validation parameters.
         """
+
         err_list = []
-        new_row = row.copy()
+        new_row  = []
         for i in range(0, len(row)):
-            field = row[i]
-            field_validation_params = self.row_validation_params[i]
+            if self.validated_field(i):
+                field = row[i]
+                field_validation_params = self.row_validation_params[i]
+            else:
+                continue
 
             type_error = self.field_type_error(field, field_validation_params)
             if type_error:
@@ -90,7 +98,7 @@ class ValidatingCSVReader:
             if type_error or valid_values_error or error_checker_error or range_error:
                 err_list.insert(0, '\n\n' + str(row) + '\n')
 
-            new_row[i] = self.convert_value(field, field_validation_params)
+            new_row.append(self.convert_value(field, field_validation_params))
         return err_list, new_row
 
     def field_type_error(self, field, field_validation_params):
