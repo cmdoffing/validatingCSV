@@ -30,6 +30,7 @@ class ValidatingCSVReader:
         self.csv_reader = csv.reader(self.csvfile, **reader_params)
         self.Row_tuple_type = self.make_row_tuple_type()
 
+
     def make_row_tuple_type(self):
         fieldnames = [d['name'] for d in self.row_validation_params if d]
         nmdtuple = namedtuple('RowTuple', fieldnames)
@@ -57,6 +58,7 @@ class ValidatingCSVReader:
         return self
 
     def validated_field(self, index):
+        # Fields that will not be validated are marked as None and will be ignored
         return self.row_validation_params[index]
 
     def row_validator(self, row):
@@ -100,6 +102,7 @@ class ValidatingCSVReader:
 
             new_row.append(self.convert_value(field, field_validation_params))
         return err_list, new_row
+
 
     def field_type_error(self, field, field_validation_params):
         if 'type' in field_validation_params:
