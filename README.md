@@ -117,9 +117,13 @@ put here for convenience.
 
 * 'strict' : When True, raise exception Error on bad CSV input. The default is False.
 
-The following parameters are new to validatingCSV:
+The following parameters are used specifically by the validatingCSV module:
 
-* 'max_bad_rows': The maximum number of rows with errors that can occur before the iterator terminates.
+* 'fields': Required. The list of field definitions containing the validation parameters.
+  There must be an entry in this list for every field in a row of the CSV file.
+
+* 'max_bad_rows': Optional, defaults to 100.
+  The maximum number of rows with errors that can occur before the iterator terminates.
   If this limit is exceeded a message similar to "101 bad CSV rows. max_bad_rows limit exceeded." is sent
   to stderr. Further processing is then terminated. This parameter is useful with large CSV files or for
   testing out validation parameters, where a mistake may cause every row to be marked as bad.

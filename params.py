@@ -8,7 +8,8 @@ def year_converter(field, base):
     return int(field, base)
 
 
-year_validation   = {'name': 'year', 'desc': 'The year the car was made.',
+year_validation   = {
+                     'name': 'year', 'desc': 'The year the car was made.',
                      'type': int, 'valid_values': [1996, 1997, 1998, 1999],
                      'converter': year_converter
                     }
@@ -19,7 +20,8 @@ price_validation  = {'name': 'price', 'type': float, 'converter': price_converte
 
 validation_params = (year_validation, make_validation, model_validation, desc_validation, price_validation)
 
-readerParams = {'delimiter': '|',
+readerParams = {
+                'delimiter': '|',
                 'max_bad_rows': 2,
                 'validation_params': validation_params
                }

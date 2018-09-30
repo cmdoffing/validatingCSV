@@ -9,16 +9,25 @@ class ValidatingCSVReader:
     Rows with bad data are written to an error file.
     """
 
-    def __init__(self, csvfilepath, reader_params, row_validation_params):
+    def __init__(self, csvfilepath, reader_params):
         self.errors = []
+
         self.num_bad_rows = 0
-        self.max_bad_rows = reader_params.get('max_bad_rows', 1000)
-        if 'max_bad_rows' in reader_params:
-            del reader_params['max_bad_rows']
+        max_bad_rows_param = 'max_bad_rows'
+        self.max_bad_rows = reader_params.get(max_bad_rows_param, 100)
+        if max_bad_rows_param in reader_params:
+            del reader_params[max_bad_rows_param]
+
+        try:
+            validation_params_key = 'validation_params'
+            self.row_validation_params = reader_params.get(validation_params_key, None)
+            del reader_params[validation_params_key]
+        except:
+            sys.stderr.write('\n"validation_params" not found in parameters\n\n')
+            raise
 
         self.csvfile = open(csvfilepath)
         self.csv_reader = csv.reader(self.csvfile, **reader_params)
-        self.row_validation_params = row_validation_params
         self.Row_tuple_type = self.make_row_tuple_type()
 
     def make_row_tuple_type(self):
