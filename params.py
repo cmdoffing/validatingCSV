@@ -1,3 +1,5 @@
+# Parameters for pipes.csv
+
 def description_is_invalid(field, field_validation_params):
     return 'Description is too long\n' if len(field) > 15 else None
 
