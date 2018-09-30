@@ -9,8 +9,9 @@ class ValidatingCSVReader:
     Rows with bad data are written to an error file.
     """
 
-    def __init__(self, csvfilepath, reader_params):
+    def __init__(self, csv_file_path, reader_params, error_file_path=None):
         self.errors = []
+        self.error_file_path = error_file_path
 
         self.num_bad_rows = 0
         max_bad_rows_param = 'max_bad_rows'
@@ -26,15 +27,15 @@ class ValidatingCSVReader:
             sys.stderr.write('\n"validation_params" not found in parameters\n\n')
             raise
 
-        self.csvfile = open(csvfilepath)
+        self.csvfile = open(csv_file_path)
         self.csv_reader = csv.reader(self.csvfile, **reader_params)
         self.Row_tuple_type = self.make_row_tuple_type()
 
 
     def make_row_tuple_type(self):
         fieldnames = [d['name'] for d in self.row_validation_params if d]
-        nmdtuple = namedtuple('RowTuple', fieldnames)
-        return nmdtuple
+        return namedtuple('RowTuple', fieldnames)
+
 
     def __next__(self):
         try:
@@ -48,7 +49,14 @@ class ValidatingCSVReader:
             self.errors.extend(err_list)
             self.num_bad_rows += 1
             if self.num_bad_rows > self.max_bad_rows:
-                sys.stderr.write(str(self.num_bad_rows) + " bad CSV rows. max_bad_rows limit exceeded.\n")
+                max_errors_msg = str(self.num_bad_rows) + \
+                                 " bad CSV rows. max_bad_rows limit exceeded.\n"
+                self.errors.insert(0, max_errors_msg)
+                if self.error_file_path:
+                    with open(self.error_file_path, 'w') as errfile:
+                        errfile.writelines(self.errors)
+                else:
+                    sys.stderr.write(self.errors)
                 raise StopIteration
             return
         else:
@@ -131,7 +139,8 @@ class ValidatingCSVReader:
         if 'valid_values' in field_validation_params:
             converted_value = self.convert_value(field, field_validation_params)
             if converted_value not in field_validation_params['valid_values']:
-                return field + ' is not a valid value of the ' + field_validation_params['name'] + ' field\n'
+                return field + ' is not a valid value of the ' + \
+                       field_validation_params['name'] + ' field\n'
         return
 
     def range_error(self, field, field_validation_params):

@@ -1,5 +1,6 @@
 # CSV validation project files
 csvdata/*.errors
+*.errors
 .idea/
 
 # Byte-compiled / optimized / DLL files
