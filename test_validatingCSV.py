@@ -3,14 +3,32 @@ import validatingCSV as vcsv
 import params
 
 
-class TestValidatingCSV(unittest.TestCase):
+class TestValidatingCSV_Pipes(unittest.TestCase):
 
     def setUp(self):
-        self.validating_reader = vcsv.ValidatingCSVReader('./csvdata/pipes.csv',
+        self.rdr = vcsv.ValidatingCSVReader('./csvdata/pipes.csv',
                                 params.readerParams)
+        self.err_string = ' '.join(self.rdr.errors)
 
-    def testUnitTest(self):
-        self.assertEqual('A', 'A')
+    def test_description_too_long(self):
+        self.assertIn('Description is too long', self.err_string)
+
+    def test_description_too_long(self):
+        self.assertIn('3 bad CSV rows.', self.err_string)
+
+
+class TestValidatingCSV_Cars(unittest.TestCase):
+
+    def setUp(self):
+        self.rdr = vcsv.ValidatingCSVReader('./csvdata/cars.csv',
+                                params.readerParams)
+        self.err_string = ' '.join(self.rdr.errors)
+
+    def test_description_too_long(self):
+        self.assertIn('Description is too long', self.err_string)
+
+    def test_description_too_long(self):
+        self.assertIn('3 bad CSV rows.', self.err_string)
 
 
 if '__name__' == '__main__':
