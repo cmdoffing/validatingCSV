@@ -1,6 +1,4 @@
 import sys
-import json
-import pipeparams as params
 import validatingCSV
 
 
