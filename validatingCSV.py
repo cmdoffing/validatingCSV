@@ -1,5 +1,6 @@
 import csv
 import sys
+import json
 from collections import namedtuple
 
 
@@ -9,9 +10,12 @@ class ValidatingCSVReader:
     Rows with bad data are written to an error file.
     """
 
-    def __init__(self, csv_file_path, reader_params, error_file_path=None):
+    def __init__(self, csv_file_path, json_params_filepath, error_file_path=None):
         self.errors = []
         self.error_file_path = error_file_path
+
+        with open(json_params_filepath) as jsonfile:
+            reader_params = json.load(jsonfile)
 
         self.num_bad_rows = 0
         max_bad_rows_param = 'max_bad_rows'
