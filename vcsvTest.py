@@ -1,11 +1,11 @@
 import sys
-import validatingCSV
-import pipeparams
+import test.pipeparams as params
 
+import validatingCSV
 
 if __name__ == '__main__':
-    filepath   = sys.argv[1]
-    rdr = validatingCSV.ValidatingCSVReader(filepath, pipeparams.readerParams,
+    filepath = sys.argv[1]
+    rdr = validatingCSV.ValidatingCSVReader(filepath, params.readerParams,
                                             error_file_path='./test/temp.errors')
     print('\n')
     for row in rdr:

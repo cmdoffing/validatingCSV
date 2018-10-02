@@ -1,6 +1,6 @@
 import unittest
 import validatingCSV as vcsv
-import params
+import pipeparams as params
 
 
 class TestValidatingCSV_Pipes(unittest.TestCase):
