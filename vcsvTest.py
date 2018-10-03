@@ -3,16 +3,14 @@ import validatingCSV
 
 
 if __name__ == '__main__':
-    filepath         = sys.argv[1]
+    csv_file_path    = sys.argv[1]
     json_params_path = sys.argv[2]
-    rdr = validatingCSV.ValidatingCSVReader(filepath, json_params_path,
-                                            error_file_path='./test/temp.errors')
-
-    print('\n')
-    for row in rdr:
+    reader = validatingCSV.ValidatingCSVReader(csv_file_path, json_params_path,
+                                               error_file_path='./test/temp.errors')
+    for row in reader:
         if row:
             print(row)
 
     print('\n---------- Errors -----------')
-    for err in rdr.errors:
+    for err in reader.errors:
         print(err)
