@@ -2,6 +2,7 @@
 csvdata/*.errors
 sandbox/
 *.errors
+*.log
 *unittest.py
 .idea/
 

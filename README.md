@@ -70,7 +70,8 @@ if __name__ == '__main__':
     csv_file_path    = sys.argv[1]
     json_params_path = sys.argv[2]
     reader = validatingCSV.ValidatingCSVReader(csv_file_path, json_params_path,
-                                               error_file_path='./test/temp.errors')
+                                               error_file_path='./test/temp.errors',
+                                               log_file_path='vcsv.log')
     for row in reader:
         if row:
             print(row)
@@ -78,6 +79,7 @@ if __name__ == '__main__':
     print('\n---------- Errors -----------')
     for err in reader.errors:
         print(err)
+
 ```
 
 
@@ -132,6 +134,24 @@ about data, and bad data is worse than no data, especially when you don't
 know it's bad.
 
 
+### ValidatingCSVReader Parameters
+
+The ValidatingCSVReader class __init__ method takes two required
+parameters and two optional parameters.
+
+* csv_file_path : Requried. A string containing the path to the CSV
+  input file.
+
+* json_params_path : Required. A string containing the path to the JSON
+  file containing the validation parameters.
+
+* error_file_path : Optional. A keyword parameter identifying the path
+  to the error file.
+
+* log_file_path : Optional. A keyword parameter identifying the path to
+  the log file.
+
+
 ### CSV Reader Parameters
 
 The validatingCSV module uses Python's built-in csv module to read the
@@ -145,7 +165,8 @@ module.
 The parameters work at two levels: the CSV file reader level and the
 validation and conversion parameters for the individual fields.
 This section covers the top-level (reader) parameters.
-The Field Specification API further below describes how fields should be defined.
+The Field Parameters section below further describes how fields should
+be defined.
 
 The validatingCSV reader uses Python's built-in csv module to perform reader 
 operations on csv iterables. To do this, the validatingCSV module supplies any
