@@ -2,7 +2,7 @@
 
 ### Overview
 
-validatingCSV is a Python package for inputting and converting data from CSV iterables.
+validatingCSV is a Python module for inputting and converting data from CSV files.
 Use validatingCSV when your CSV data absolutely, positively has to be valid.
 Which is pretty much always.
 
