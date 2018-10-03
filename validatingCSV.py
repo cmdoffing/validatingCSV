@@ -115,6 +115,16 @@ class ValidatingCSVReader:
                 err_list = self.add_error_to_list(row, err_list, range_error)
                 continue
 
+            min_len_error = self.min_len_error(field, value, field_validation_params)
+            if min_len_error:
+                err_list = self.add_error_to_list(row, err_list, min_len_error)
+                continue
+
+            max_len_error = self.max_len_error(field, value, field_validation_params)
+            if max_len_error:
+                err_list = self.add_error_to_list(row, err_list, max_len_error)
+                continue
+
             new_row.append(value)
         return new_row, err_list
 
@@ -170,7 +180,6 @@ class ValidatingCSVReader:
                        field_validation_params['name'] + ' field\n'
         return
 
-
     def range_error(self, field, value, field_validation_params):
         min_value = field_validation_params.get('min', None)
         if min_value and value < min_value:
@@ -179,3 +188,13 @@ class ValidatingCSVReader:
         max_value = field_validation_params.get('max', None)
         if max_value and value > max_value:
             return 'Value "' + field + '" is greater than the specified max value\n'
+
+    def min_len_error(self, field, value, field_validation_params):
+        min_len = field_validation_params.get('min_len', None)
+        if min_len and len(value) < min_len:
+            return 'The length of value "' + field + '" is less than min_len\n'
+
+    def max_len_error(self, field, value, field_validation_params):
+        max_len = field_validation_params.get('max_len', None)
+        if max_len and len(value) > max_len:
+            return 'The length of value "' + field + '" is greater than max_len\n'

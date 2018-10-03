@@ -11,7 +11,9 @@
     null,
     null,
     {
-        "name": "description"
+        "name": "description",
+        "min_len": 5,
+        "max_len": 15
     },
     {
         "name": "price",
