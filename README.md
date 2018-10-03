@@ -3,8 +3,8 @@
 ### Overview
 
 validatingCSV is a Python module for reading, converting, and validating
-data from CSV files.
-When instantiated, the ValidatingCSVReader class returns an iterator that
+data from CSV files. It consists of a single class, ValidatingCSVReader,
+which when instantiated, returns an iterator that
 returns one row of data at a time. Each row is represented as a named tuple,
 with the field names of the named tuple supplied as part of the validation
 parameters. The reader instance raises the standard StopIteration exception
