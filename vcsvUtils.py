@@ -2,6 +2,7 @@
 def skip_n_lines_in_file(file_path, num_lines):
     """
     Remove the initial num_lines of text from a file.
+
     :param file_path: The path to the file that needs initial lines removed.
     :param num_lines: The number of initial text lines to remove from the file
                       at file_path.
@@ -25,5 +26,16 @@ def skip_n_lines_in_file(file_path, num_lines):
     return temp_file_path
 
 
-def remove_items_from_dict(dict, bad_keys):
-    pass
+def remove_items_from_dict(a_dict, bad_keys):
+    """
+    Remove any items from a_dict whose keys are in bad_keys.
+
+    :param a_dict: The dict to have keys removed from.
+    :param bad_keys: The keys to remove from a_dict.
+    :return: A copy of a_dict with the bad_keys items removed.
+    """
+    new_dict = {}
+    for k in a_dict.keys():
+        if k not in bad_keys:
+            new_dict[k] = a_dict[k]
+    return new_dict

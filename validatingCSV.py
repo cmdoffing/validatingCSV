@@ -30,13 +30,10 @@ class ValidatingCSVReader:
         self.num_bad_rows = 0
         max_bad_rows_param = 'max_bad_rows'
         self.max_bad_rows = reader_params.get(max_bad_rows_param, 100)
-        if max_bad_rows_param in reader_params:
-            del reader_params[max_bad_rows_param]
 
+        validation_params_key = 'validation_params'
         try:
-            validation_params_key = 'validation_params'
             self.row_validation_params = reader_params.get(validation_params_key, None)
-            del reader_params[validation_params_key]
         except:
             if self.log_file_path:
                 logging.error(validation_params_key + ' entry not found in parameters file.')
@@ -44,18 +41,17 @@ class ValidatingCSVReader:
 
         num_header_lines_key = 'num_header_lines'
         num_header_lines = reader_params.get(num_header_lines_key, 0)
-        if num_header_lines_key in reader_params:
-            del reader_params[num_header_lines_key]
         if num_header_lines <= 0:
             # Don't skip any lines if there are no header lines
             new_csv_path = csv_file_path
         else:
             new_csv_path = vcsvUtils.skip_n_lines_in_file(csv_file_path, num_header_lines)
 
+        csv_reader_params = vcsvUtils.remove_items_from_dict(reader_params,
+                                [max_bad_rows_param, validation_params_key,
+                                 num_header_lines_key])
         self.csvfile = open(new_csv_path)
-        for n in range(1, num_header_lines):
-            self.csvfile.readline()
-        self.csv_reader = csv.reader(self.csvfile, **reader_params)
+        self.csv_reader = csv.reader(self.csvfile, **csv_reader_params)
         self.Row_tuple_type = self.make_row_tuple_type()
 
 
