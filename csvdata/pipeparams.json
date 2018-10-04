@@ -1,6 +1,7 @@
 {
 "delimiter": "|",
-"max_bad_rows": 2,
+"max_bad_rows": 222,
+"num_header_lines": 1,
 "validation_params": [
     {
         "name": "year",
@@ -13,7 +14,7 @@
     {
         "name": "description",
         "min_len": 5,
-        "max_len": 15
+        "max_len": 35
     },
     {
         "name": "price",

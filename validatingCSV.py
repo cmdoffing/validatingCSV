@@ -3,6 +3,7 @@ import json
 import logging
 import datetime
 from collections import namedtuple
+import vcsvUtils
 
 
 class ValidatingCSVReader:
@@ -41,7 +42,19 @@ class ValidatingCSVReader:
                 logging.error(validation_params_key + ' entry not found in parameters file.')
             raise
 
-        self.csvfile = open(csv_file_path)
+        num_header_lines_key = 'num_header_lines'
+        num_header_lines = reader_params.get(num_header_lines_key, 0)
+        if num_header_lines_key in reader_params:
+            del reader_params[num_header_lines_key]
+        if num_header_lines <= 0:
+            # Don't skip any lines if there are no header lines
+            new_csv_path = csv_file_path
+        else:
+            new_csv_path = vcsvUtils.skip_n_lines_in_file(csv_file_path, num_header_lines)
+
+        self.csvfile = open(new_csv_path)
+        for n in range(1, num_header_lines):
+            self.csvfile.readline()
         self.csv_reader = csv.reader(self.csvfile, **reader_params)
         self.Row_tuple_type = self.make_row_tuple_type()
 

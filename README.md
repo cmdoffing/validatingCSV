@@ -239,10 +239,11 @@ module and not by the underlying built-in csv module:
   parameter mistake may cause every row to be marked as bad.
 
 * 'num_header_lines' : The number of header lines to ignore before
-  retrieving the CSV rows as data. If you have header lines with fields
-  to be converted to numbers, you will almost certainly get errors
-  since the validator will try to convert the strings in the headers to
-  numbers.
+  retrieving the CSV rows as data. Because of limitations in the csv
+   module, the only way to skip header lines is to create a temporary
+   file with the initial 'num_header_lines' removed. This temporary file
+   is only created if this parameter is present and > 0. The temporary
+   file is the one actually used to read in data.
 
 
 #### Field Parameters
