@@ -83,6 +83,18 @@ if __name__ == '__main__':
 ```
 
 
+The iterator returned by ValidatingCSVReader will return a None value if
+the input row had an error. As above, you should check all rows with
+something similar to the following code:
+
+```python
+    ....
+    for row in reader:
+        if row:
+            # Process the named tuple that was returned by the iterator
+```
+
+
 ### Example CSV Data
 
 ```
@@ -149,7 +161,7 @@ parameters and two optional parameters.
   to the error file.
 
 * log_file_path : Optional. A keyword parameter identifying the path to
-  the log file.
+  a log file. Uses Python's built-in logging package.
 
 
 ### CSV Reader Parameters

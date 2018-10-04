@@ -50,8 +50,8 @@ class ValidatingCSVReader:
         csv_reader_params = vcsvUtils.remove_items_from_dict(reader_params,
                                 [max_bad_rows_param, validation_params_key,
                                  num_header_lines_key])
-        self.csvfile = open(new_csv_path)
-        self.csv_reader = csv.reader(self.csvfile, **csv_reader_params)
+        self.csv_file = open(new_csv_path)
+        self.csv_reader = csv.reader(self.csv_file, **csv_reader_params)
         self.Row_tuple_type = self.make_row_tuple_type()
 
 
@@ -67,10 +67,10 @@ class ValidatingCSVReader:
             # This is the place to close the input file when we run out of
             # records and to write out any errors to the error file, which
             # handles errors as a batch.
-            self.csvfile.close()
+            self.csv_file.close()
             if self.error_file_path:
-                with open(self.error_file_path, 'w') as errfile:
-                    errfile.writelines(self.errors)
+                with open(self.error_file_path, 'w') as error_file:
+                    error_file.writelines(self.errors)
             raise StopIteration
 
         # Now validate the row just retrieved from the CSV file
@@ -88,8 +88,8 @@ class ValidatingCSVReader:
                                  " bad CSV rows. max_bad_rows limit exceeded."
                 self.errors.append(max_errors_msg)
                 if self.error_file_path:
-                    with open(self.error_file_path, 'w') as errfile:
-                        errfile.writelines(self.errors)
+                    with open(self.error_file_path, 'w') as error_file:
+                        error_file.writelines(self.errors)
                 if self.log_file_path:
                     logging.error(max_errors_msg)
                 raise StopIteration
@@ -110,12 +110,13 @@ class ValidatingCSVReader:
 
     def row_validator(self, row):
         """
-        Checks each row (which is a list of strings) against self.row_validation_params for errors.
+        Checks each row (which is a list of strings) against
+        self.row_validation_params for errors.
         Returns an empty list if the row is valid, error info otherwise.
-        If an error is found, add the row to the front of the list followed by all of the
-        error messages from the row.
-        The row param is checked against self.row_validation_params, which is a list of dicts
-        of validation parameters.
+        If an error is found, add the row to the front of the list
+        followed by all of the error messages from the row.
+        The row param is checked against self.row_validation_params, which is
+        a list of dicts of validation parameters.
         """
 
         err_list = []
@@ -160,10 +161,17 @@ class ValidatingCSVReader:
         # Returns a pair of the converted value, if no error, and an error message (or None).
         # If the field is an empty string, return the default value.
         # If no type param is present, default the field type to 'string'.
-        field_type = field_validation_params.get('type', 'string')
 
+        field_type = field_validation_params.get('type', 'string')
         if field_type == 'string':
-            return (field, None)
+            if field != '':
+                return (field, None)
+            else:
+                default = field_validation_params.get('default', None)
+                if default:
+                    return (default, None)
+                else:
+                    return (field, None)
 
         # This check has to come after the check for a field type of string,
         # since an empty string is a valid value for string fields but not

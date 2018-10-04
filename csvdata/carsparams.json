@@ -1,0 +1,27 @@
+{
+"delimiter": ",",
+"max_bad_rows": 2,
+"num_header_lines": 0,
+"validation_params": [
+    {
+        "name": "Year",
+        "desc": "The year the car was made.",
+        "type": "integer",
+        "valid_values": [1996, 1997, 1998, 1999]
+    },
+    {
+        "name": "Make",
+        "valid_values": ["Jeep", "Chevy", "Buick"]
+    },
+    {
+        "name": "Model"
+    },
+    {
+        "name": "Description",
+        "min_len": 0,
+        "max_len": 35,
+        "default": "No description given"
+    },
+    null
+]
+}
