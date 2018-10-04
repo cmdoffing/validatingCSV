@@ -7,14 +7,14 @@
         "name": "year",
         "desc": "The year the car was made.",
         "type": "integer",
-        "valid_values": [1996,    1998, 1999]
+        "valid_values": [1996, 1998, 1999]
     },
     null,
     null,
     {
         "name": "description",
         "min_len": 5,
-        "max_len": 35
+        "max_len": 15
     },
     {
         "name": "price",
