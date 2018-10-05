@@ -7,7 +7,8 @@ import validatingCSV as vcsv
 temp_file_path = '__temp_skipped_lines_file__.txt'
 
 
-class TestPipeCsvFile(unittest.TestCase):
+class TestPipesCsvFile(unittest.TestCase):
+    """Test against the pipes.csv data file."""
 
     def setUp(self):
         temp_file = open(temp_file_path)
@@ -38,6 +39,7 @@ class TestPipeCsvFile(unittest.TestCase):
 
 
 class TestCarsCsvFile(unittest.TestCase):
+    """Test against the cars.csv data file."""
 
     def setUp(self):
         temp_file = open(temp_file_path)

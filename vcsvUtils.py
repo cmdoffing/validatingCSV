@@ -28,7 +28,7 @@ def skip_n_lines_in_file(file_path, num_lines):
 
 def remove_items_from_dict(a_dict, bad_keys):
     """
-    Remove any items from a_dict whose keys are in bad_keys.
+    Remove every item from a_dict whose key is in bad_keys.
 
     :param a_dict: The dict to have keys removed from.
     :param bad_keys: The keys to remove from a_dict.
