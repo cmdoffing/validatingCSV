@@ -23,7 +23,7 @@ validatingCSV has the following design goals:
 
 * Maximum declarative input validation.
 This is based on the developer's long
-experience that that bad input data is far more common that is usually
+experience that bad input data is far more common than is usually
 supposed. We want to check the input data in every declarative way possible.
 
 * Declarative specification using JSON.
