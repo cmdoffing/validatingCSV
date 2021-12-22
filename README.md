@@ -8,11 +8,11 @@ which when instantiated returns an iterator that
 returns one row of data at a time. Each row is represented as a named tuple,
 with the field names of the named tuple supplied as part of the validation
 parameters. The reader instance raises the standard StopIteration exception
-(as do the built-in Python iterators) when it attempts to read the last
+(as do the built-in Python iterators) when it attempts to read past the last
 CSV row.
 
 validatingCSV reads its validation and conversion parameters from a JSON file
-and outputs any errors to an instance attribute of the ValidatingCSVReader
+and outputs any errors to an instance of the ValidatingCSVReader
 class. The user can also specify an optional error_file_path parameter
 when instancing the class to hold errors.
 
@@ -285,7 +285,7 @@ in the current row.
 * 'desc' : A string describing the field. Useful for documenting your
   validation process but otherwise unused by the program.
 
-* 'type' : If present, this must be either 'integer', 'float', 'complex'
+* 'type' : If present, this must be either 'integer', 'float',
   or 'string'. If not present, the type defaults to 'string'.
   No conversion is done on 'string' types.
   'integer', 'float', and 'complex' types are converted before being
