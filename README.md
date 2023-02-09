@@ -272,12 +272,12 @@ If you want to forgo validating, say, the third field, place a None
 (recommended) or some other falsy value in the third position of the
 validation parameters list.
 
-All of the following attributes are optional except for 'name.'
-
 There are several kinds of validations that can be specified.
 They are done in the order listed below.
 If any one of them fails, no further validations are done for that field
 in the current row.
+
+All of the following attributes are optional except for 'name.'
 
 * 'name' : Required, since the named tuple will be created using this name.
   The name must be a valid Python identifier.
