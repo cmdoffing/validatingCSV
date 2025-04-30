@@ -1,5 +1,5 @@
-## validatingCSV
-### A Declarative CSV File Validator Written In Python 3
+# CsvValidator
+## A Declarative CSV File Validator Written In Python 3
 
 ### Overview
 
