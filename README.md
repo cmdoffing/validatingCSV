@@ -5,22 +5,13 @@
 
 Input data files, including input data stored in CSV format, sometimes contain
 data and/or format errors. No program can possibly check for all possible kinds
-of errors. However, 
+of errors. However, many kinds of errors can still be checked, including whether
+or not the file is actually in a valid CSV format. E.g., whether the fields in the
+different columns are all separated by the same separator charactor.
 
-validatingCSV is a Python module for reading, converting, and validating
-data from CSV files. It consists of a single class, ValidatingCSVReader,
-which when instantiated returns an iterator that
-returns one row of data at a time. Each row is represented as a named tuple,
-with the field names of the named tuple supplied as part of the validation
-parameters. The reader instance raises the standard StopIteration exception
-(as do the built-in Python iterators) when it attempts to read past the last
-CSV row.
-
-validatingCSV reads its validation and conversion parameters from a JSON file
-and outputs any errors to an instance of the ValidatingCSVReader
-class. The user can also specify an optional error_file_path parameter
-when instancing the class to hold errors.
-
+CsvValidator reads its validation and conversion parameters from a JSON file
+and outputs any error it finds to the console with a line number (indexed starting
+from 1 rather than 0).
 
 ### Design Goals
 
@@ -325,3 +316,19 @@ All of the following attributes are optional except for 'name.'
 * 'valid_values' : An iterable containing only those values that are
   valid for this field. If a non-string type is used, the field will
   first be converted to a value of that type before this check is made.
+
+### Implementation Notes
+
+CsvValidator is a Python 3 module for validating
+data from CSV files. It consists of a single class, ValidatingCSVReader,
+which when instantiated returns an iterator that
+returns one row of data at a time. Each row is represented as a named tuple,
+with the field names of the named tuple supplied as part of the validation
+parameters. The reader instance raises the standard StopIteration exception
+(as do the built-in Python iterators) when it attempts to read past the last
+CSV row.
+
+validatingCSV reads its validation and conversion parameters from a JSON file
+and outputs any errors to an instance of the ValidatingCSVReader
+class.
+
