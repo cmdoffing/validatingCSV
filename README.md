@@ -1,4 +1,5 @@
-## validatingCSV: A Declarative, Validating CSV Reader Library For Python 3
+## validatingCSV
+### A Declarative CSV File Validator Written In Python 3
 
 ### Overview
 
