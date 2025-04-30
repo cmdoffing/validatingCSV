@@ -3,6 +3,10 @@
 
 ### Overview
 
+Input data files, including input data stored in CSV format, sometimes contain
+data and/or format errors. No program can possibly check for all possible kinds
+of errors. However, 
+
 validatingCSV is a Python module for reading, converting, and validating
 data from CSV files. It consists of a single class, ValidatingCSVReader,
 which when instantiated returns an iterator that
